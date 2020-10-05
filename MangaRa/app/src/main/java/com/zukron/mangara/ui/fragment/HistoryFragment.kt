@@ -13,7 +13,7 @@ import com.zukron.mangara.adapter.HistoryAdapter
 import com.zukron.mangara.adapter.listener.OnSelectedHistoryListener
 import com.zukron.mangara.ui.detail.ChapterActivity
 import com.zukron.mangara.ui.viewmodel.HomeViewModel
-import kotlinx.android.synthetic.main.fragment_history.*
+import kotlinx.android.synthetic.main.fragment_history.view.*
 
 /**
  * Project name is Manga Ra
@@ -38,7 +38,7 @@ class HistoryFragment : Fragment(), OnSelectedHistoryListener {
         homeViewModel.historyManga.observe(requireActivity()) {
             val adapter = HistoryAdapter(it)
             adapter.setOnSelectedHistoryListener(this)
-            historyFrag_recyclerView.adapter = adapter
+            view.historyFrag_recyclerView.adapter = adapter
         }
     }
 

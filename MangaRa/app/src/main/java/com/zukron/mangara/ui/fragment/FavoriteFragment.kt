@@ -13,7 +13,7 @@ import com.zukron.mangara.adapter.FavoriteAdapter
 import com.zukron.mangara.adapter.listener.OnSelectedMangaListener
 import com.zukron.mangara.ui.detail.DetailMangaActivity
 import com.zukron.mangara.ui.viewmodel.HomeViewModel
-import kotlinx.android.synthetic.main.fragment_favorite.*
+import kotlinx.android.synthetic.main.fragment_favorite.view.*
 
 /**
  * Project name is Manga Ra
@@ -39,7 +39,7 @@ class FavoriteFragment : Fragment(), OnSelectedMangaListener {
             // adapter
             val adapter = FavoriteAdapter(it)
             adapter.setOnSelectedMangaListener(this)
-            favoriteFrag_recyclerView.adapter = adapter
+            view.favoriteFrag_recyclerView.adapter = adapter
         }
     }
 

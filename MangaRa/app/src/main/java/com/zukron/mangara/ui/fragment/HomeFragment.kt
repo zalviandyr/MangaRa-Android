@@ -20,7 +20,6 @@ import com.zukron.mangara.ui.home.AllContentActivity
 import com.zukron.mangara.ui.detail.DetailMangaActivity
 import com.zukron.mangara.ui.home.SearchMangaActivity
 import com.zukron.mangara.ui.viewmodel.HomeViewModel
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class HomeFragment : Fragment(), View.OnClickListener, OnSelectedGenreListener,
@@ -51,8 +50,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnSelectedGenreListener,
         }
 
         // set name
-        homeFrag_tvFullName.text = homeViewModel.firebaseAuth.currentUser?.displayName
-        homeFrag_tvGreet.text = Utilities.greeting(requireContext())
+        view.homeFrag_tvFullName.text = homeViewModel.firebaseAuth.currentUser?.displayName
+        view.homeFrag_tvGreet.text = Utilities.greeting(requireContext())
 
         homeViewModel.popularManga.observe(requireActivity()) {
             popularAdapter.popularMangaResponseList = it
@@ -76,14 +75,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnSelectedGenreListener,
         }
 
         // button listener
-        homeFrag_btnMorePopular.setOnClickListener(this)
-        homeFrag_btnMoreGenre.setOnClickListener(this)
-        homeFrag_btnSearch.setOnClickListener(this)
+        view.homeFrag_btnMorePopular.setOnClickListener(this)
+        view.homeFrag_btnMoreGenre.setOnClickListener(this)
+        view.homeFrag_btnSearch.setOnClickListener(this)
 
         // country action (linear layout listener)
-        homeFrag_llManga.setOnClickListener(this)
-        homeFrag_llManhua.setOnClickListener(this)
-        homeFrag_llManhwa.setOnClickListener(this)
+        view.homeFrag_llManga.setOnClickListener(this)
+        view.homeFrag_llManhua.setOnClickListener(this)
+        view.homeFrag_llManhwa.setOnClickListener(this)
     }
 
     override fun onClick(view: View?) {
@@ -98,7 +97,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnSelectedGenreListener,
                     startActivity(intent)
                 }
                 R.id.homeFrag_btnMoreGenre -> {
-                    if (homeFrag_btnMoreGenre.isChecked) {
+                    if (view.homeFrag_btnMoreGenre.isChecked) {
                         // total semua genre ada 63, data yng kita perlukan hanya 56
                         // kenapa karena 7 endpoint lainnya bukan endpoint melainkan halaman website
                         genreAdapter.genreList = homeViewModel.genre.value?.subList(0, 56)
