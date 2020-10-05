@@ -1,0 +1,59 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:statusBarColor">@color/colorMain</item>
+    </style>
+
+    <style name="AppTheme.ScrollEdge">
+        <item name="android:colorEdgeEffect">@color/colorMainLight</item>
+    </style>
+
+    <!--    TEXT APPEARANCE    -->
+    <style name="MangaRa.TextAppearance.Title1" parent="">
+        <item name="android:fontFamily">@font/bold</item>
+        <item name="android:textSize">40sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Title2" parent="">
+        <item name="android:fontFamily">@font/bold</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Title3" parent="">
+        <item name="android:fontFamily">@font/bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Title4" parent="">
+        <item name="android:fontFamily">@font/bold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Body1" parent="">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Body2" parent="">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="MangaRa.TextAppearance.Body3" parent="">
+        <item name="android:fontFamily">@font/bold</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <!--  SHAPE ROUND  -->
+    <style name="MangaRa.ShapeAppearance" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+    </style>
+</resources>
