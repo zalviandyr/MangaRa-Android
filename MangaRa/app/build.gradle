@@ -103,4 +103,8 @@ dependencies {
     // three tan abp
     def three_tan_abp_version = "1.2.4"
     implementation "com.jakewharton.threetenabp:threetenabp:$three_tan_abp_version"
+
+    // zoom layout
+    def zoom_layout_version = "2.0.0"
+    implementation "com.shopgun.android:zoomlayout:$zoom_layout_version"
 }
