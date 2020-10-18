@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
@@ -14,13 +12,10 @@ import com.zukron.mangara.model.ChapterMangaResponse
 import com.zukron.mangara.model.DetailMangaResponse
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.network.RestApi
-import com.zukron.mangara.repository.factory.ChapterDataFactory
-import com.zukron.mangara.repository.factory.ChapterImageDataFactory
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.net.SocketTimeoutException
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
@@ -42,13 +37,6 @@ class DetailRepository(context: Context) {
     }
 
     private val apiService = RestApi.getApiService(context)
-    private val allContentRepository = AllContentRepository.getInstance(context)
-    private val postPerPage = 20
-    private val executor = Executors.newFixedThreadPool(5)
-    private val pageListConfig = PagedList.Config.Builder()
-        .setPageSize(postPerPage)
-        .setEnablePlaceholders(false)
-        .build()
 
     val networkState: MutableLiveData<NetworkState> = RestApi.networkState
 
@@ -92,25 +80,75 @@ class DetailRepository(context: Context) {
     fun getAllChapter(
         endpoint: String,
         compositeDisposable: CompositeDisposable
-    ): LiveData<PagedList<DetailMangaResponse.Chapter>> {
-        val chapterDataFactory =
-            ChapterDataFactory(endpoint, allContentRepository, compositeDisposable)
+    ): LiveData<List<DetailMangaResponse.Chapter>> {
+        networkState.postValue(NetworkState.LOADED)
 
-        return LivePagedListBuilder(chapterDataFactory, pageListConfig)
-            .setFetchExecutor(executor)
-            .build()
+        return object : LiveData<List<DetailMangaResponse.Chapter>>() {
+            override fun onActive() {
+                super.onActive()
+
+                compositeDisposable.add(
+                    apiService.getDetailManga(endpoint)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .timeout(5, TimeUnit.SECONDS)
+                        .retryWhen {
+                            it.takeWhile { v ->
+                                return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
+                                    networkState.postValue(NetworkState.TIMEOUT)
+                                    true
+                                } else {
+                                    networkState.postValue(NetworkState.ERROR)
+                                    false
+                                }
+                            }
+                        }
+                        .subscribe({
+                            value = it.chapter
+                            networkState.postValue(NetworkState.LOADED)
+                        }, {
+                            networkState.postValue(NetworkState.ERROR)
+                        })
+                )
+            }
+        }
     }
 
     fun getChapterImage(
         endpoint: String,
         compositeDisposable: CompositeDisposable
-    ): LiveData<PagedList<ChapterMangaResponse.ChapterImage>> {
-        val chapterImageDataFactory =
-            ChapterImageDataFactory(endpoint, allContentRepository, compositeDisposable)
+    ): LiveData<List<ChapterMangaResponse.ChapterImage>> {
+        networkState.postValue(NetworkState.LOADING)
 
-        return LivePagedListBuilder(chapterImageDataFactory, pageListConfig)
-            .setFetchExecutor(executor)
-            .build()
+        return object : LiveData<List<ChapterMangaResponse.ChapterImage>>() {
+            override fun onActive() {
+                super.onActive()
+
+                compositeDisposable.add(
+                    apiService.getChapterImage(endpoint)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .timeout(5, TimeUnit.SECONDS)
+                        .retryWhen {
+                            it.takeWhile { v ->
+                                return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
+                                    networkState.postValue(NetworkState.TIMEOUT)
+                                    true
+                                } else {
+                                    networkState.postValue(NetworkState.ERROR)
+                                    false
+                                }
+                            }
+                        }
+                        .subscribe({
+                            value = it.chapterImage
+                            networkState.postValue(NetworkState.LOADED)
+                        }, {
+                            networkState.postValue(NetworkState.ERROR)
+                        })
+                )
+            }
+        }
     }
 
     fun setFavoriteManga(

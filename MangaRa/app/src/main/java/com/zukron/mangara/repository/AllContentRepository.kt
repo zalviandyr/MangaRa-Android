@@ -1,14 +1,6 @@
 package com.zukron.mangara.repository
 
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.LiveData
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.zukron.mangara.model.*
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.network.RestApi
@@ -202,46 +194,6 @@ class AllContentRepository(context: Context) {
         networkState.postValue(NetworkState.LOADING)
 
         return apiService.getSearchManga(keyword)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .timeout(5, TimeUnit.SECONDS)
-            .retryWhen {
-                it.takeWhile { v ->
-                    return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
-                        networkState.postValue(NetworkState.TIMEOUT)
-                        true
-                    } else {
-                        networkState.postValue(NetworkState.ERROR)
-                        false
-                    }
-                }
-            }
-    }
-
-    fun getAllChapter(enpoint: String): Flowable<DetailMangaResponse> {
-        networkState.postValue(NetworkState.LOADING)
-
-        return apiService.getDetailManga(enpoint)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .timeout(5, TimeUnit.SECONDS)
-            .retryWhen {
-                it.takeWhile { v ->
-                    return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
-                        networkState.postValue(NetworkState.TIMEOUT)
-                        true
-                    } else {
-                        networkState.postValue(NetworkState.ERROR)
-                        false
-                    }
-                }
-            }
-    }
-
-    fun getChapterImage(endpoint: String): Flowable<ChapterMangaResponse> {
-        networkState.postValue(NetworkState.LOADING)
-
-        return apiService.getChapterImage(endpoint)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .timeout(5, TimeUnit.SECONDS)

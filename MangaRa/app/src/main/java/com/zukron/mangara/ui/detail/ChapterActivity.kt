@@ -2,7 +2,6 @@ package com.zukron.mangara.ui.detail
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
@@ -48,17 +47,15 @@ class ChapterActivity : AppCompatActivity(), View.OnClickListener {
             finish()
         }
 
-        // adapter
-        val adapter = ChapterImageAdapter()
-        chapterAct_recyclerView.adapter = adapter
-
         // view model
         detailViewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
         detailViewModel.setMangaEndpoint(mangaEndpoint)
         detailViewModel.setChapterEndpoint(chapterEndpoint)
 
         detailViewModel.chapterImage.observe(this) {
-            adapter.submitList(it)
+            // adapter
+            val adapter = ChapterImageAdapter(it)
+            chapterAct_recyclerView.adapter = adapter
 
             detailViewModel.detailManga.observe(this) { manga ->
                 // set history
