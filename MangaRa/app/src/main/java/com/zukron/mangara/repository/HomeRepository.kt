@@ -12,6 +12,7 @@ import com.google.firebase.ktx.Firebase
 import com.zukron.mangara.model.DetailMangaResponse
 import com.zukron.mangara.model.GenreResponse
 import com.zukron.mangara.model.PopularMangaResponse
+import com.zukron.mangara.model.SearchMangaResponse
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.network.RestApi
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -116,6 +117,41 @@ class HomeRepository(context: Context) {
                         }
                         .subscribe({
                             value = it.data
+                            networkState.postValue(NetworkState.LOADED)
+                        }, {
+                            networkState.postValue(NetworkState.ERROR)
+                        })
+                )
+            }
+        }
+    }
+
+    fun getSearchManga(
+        keyword: String,
+        compositeDisposable: CompositeDisposable
+    ): LiveData<List<SearchMangaResponse.SearchMangaResponseItem>> {
+        return object : LiveData<List<SearchMangaResponse.SearchMangaResponseItem>>() {
+            override fun onActive() {
+                super.onActive()
+
+                compositeDisposable.add(
+                    apiService.getSearchManga(keyword)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .timeout(5, TimeUnit.SECONDS)
+                        .retryWhen {
+                            it.takeWhile {v ->
+                                return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
+                                    networkState.postValue(NetworkState.TIMEOUT)
+                                    true
+                                } else {
+                                    networkState.postValue(NetworkState.ERROR)
+                                    false
+                                }
+                            }
+                        }
+                        .subscribe({
+                            value = it
                             networkState.postValue(NetworkState.LOADED)
                         }, {
                             networkState.postValue(NetworkState.ERROR)

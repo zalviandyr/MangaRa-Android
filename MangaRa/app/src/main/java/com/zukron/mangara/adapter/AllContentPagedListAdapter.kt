@@ -25,8 +25,6 @@ class AllContentPagedListAdapter<T>(
     private val onSelectedMangaListener: OnSelectedMangaListener
 ) : PagedListAdapter<T, RecyclerView.ViewHolder>(ItemDiffCallback<T>()) {
 
-    var favoriteMangaList: List<MangaResponse.Manga> = listOf()
-
     private val CONTENT_VIEW_TYPE = 1
     private val NETWORK_VIEW_TYPE = 2
     private var networkState: NetworkState? = null
@@ -79,25 +77,6 @@ class AllContentPagedListAdapter<T>(
                 is GenreMangaResponse.Manga -> {
                     itemView.mangaItem_tvTitle.text = item.title
                     itemView.mangaItem_tvType.text = item.type
-
-                    // background type
-                    itemView.mangaItem_tvType.background =
-                        Utilities.backgroundType(item.type, itemView.context)
-
-                    Glide.with(itemView.context)
-                        .load(item.thumb)
-                        .placeholder(circularProgressDrawable)
-                        .into(itemView.mangaItem_imageView)
-
-                    // listener
-                    itemView.setOnClickListener {
-                        onSelectedMangaListener.onSelectedManga(item.endpoint)
-                    }
-                }
-                is SearchMangaResponse.SearchMangaResponseItem -> {
-                    itemView.mangaItem_tvTitle.text = item.title
-                    itemView.mangaItem_tvType.text = item.type
-                    itemView.mangaItem_tvUpdateOn.text = item.updatedOn
 
                     // background type
                     itemView.mangaItem_tvType.background =

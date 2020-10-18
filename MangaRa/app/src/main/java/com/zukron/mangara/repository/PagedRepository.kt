@@ -10,7 +10,6 @@ import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.repository.factory.GenreMangaDataFactory
 import com.zukron.mangara.repository.factory.MangaDataFactory
 import com.zukron.mangara.repository.factory.PopularMangaDataFactory
-import com.zukron.mangara.repository.factory.SearchMangaDataFactory
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.concurrent.Executors
 
@@ -99,18 +98,6 @@ class PagedRepository(context: Context) {
             GenreMangaDataFactory(genreEndpoint, allContentRepository, compositeDisposable)
 
         return LivePagedListBuilder(genreMangaDataFactory, pageListConfig)
-            .setFetchExecutor(executor)
-            .build()
-    }
-
-    fun searchManga(
-        keyword: String,
-        compositeDisposable: CompositeDisposable
-    ): LiveData<PagedList<SearchMangaResponse.SearchMangaResponseItem>> {
-        val searchMangaDataFactory =
-            SearchMangaDataFactory(keyword, allContentRepository, compositeDisposable)
-
-        return LivePagedListBuilder(searchMangaDataFactory, pageListConfig)
             .setFetchExecutor(executor)
             .build()
     }
