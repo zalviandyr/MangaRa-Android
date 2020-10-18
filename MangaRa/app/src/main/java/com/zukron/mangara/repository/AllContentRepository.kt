@@ -218,26 +218,6 @@ class AllContentRepository(context: Context) {
             }
     }
 
-    fun getAllChapter(enpoint: String): Flowable<DetailMangaResponse> {
-        networkState.postValue(NetworkState.LOADING)
-
-        return apiService.getDetailManga(enpoint)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .timeout(5, TimeUnit.SECONDS)
-            .retryWhen {
-                it.takeWhile { v ->
-                    return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
-                        networkState.postValue(NetworkState.TIMEOUT)
-                        true
-                    } else {
-                        networkState.postValue(NetworkState.ERROR)
-                        false
-                    }
-                }
-            }
-    }
-
     fun getChapterImage(endpoint: String): Flowable<ChapterMangaResponse> {
         networkState.postValue(NetworkState.LOADING)
 

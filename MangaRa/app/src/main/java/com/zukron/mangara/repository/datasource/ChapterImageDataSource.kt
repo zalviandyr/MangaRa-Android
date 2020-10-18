@@ -21,7 +21,7 @@ class ChapterImageDataSource(
     private val networkState = allContentRepository.networkState
 
     private fun fetchData(
-        starPosition: Int,
+        startPosition: Int,
         loadCount: Int,
         load: (List<ChapterMangaResponse.ChapterImage>) -> Unit
     ) {
@@ -32,13 +32,13 @@ class ChapterImageDataSource(
                     // contoh banyak data 90, maka semisal startPosition ada di 80
                     // maka 80 - 90 tidak diambil melainkan data yang diambil adalah 80 - 100
                     // karena postPerPage ny adalah 20
-                    var endPosition = starPosition + loadCount
+                    var endPosition = startPosition + loadCount
                     if (endPosition > totalCount) {
-                        val remainsPosition = totalCount - starPosition
-                        endPosition = starPosition + remainsPosition
+                        val remainsPosition = totalCount - startPosition
+                        endPosition = startPosition + remainsPosition
                     }
 
-                    it.chapterImage.subList(starPosition, endPosition)
+                    it.chapterImage.subList(startPosition, endPosition)
                 }
                 .subscribe{
                     load(it)

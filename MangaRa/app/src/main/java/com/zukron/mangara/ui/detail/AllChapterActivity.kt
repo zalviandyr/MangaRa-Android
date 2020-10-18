@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.zukron.mangara.R
-import com.zukron.mangara.adapter.AllChapterPagedListAdapter
+import com.zukron.mangara.adapter.AllChapterAdapter
 import com.zukron.mangara.adapter.listener.OnSelectedChapterListener
 import com.zukron.mangara.ui.viewmodel.DetailViewModel
 import kotlinx.android.synthetic.main.activity_all_content.*
@@ -42,17 +42,13 @@ class AllChapterActivity : AppCompatActivity(), OnSelectedChapterListener {
             finish()
         }
 
-        // adapter
-        val adapter = AllChapterPagedListAdapter()
-        adapter.setOnSelectedChapterListener(this)
-        allContentAct_recyclerView.adapter = adapter
-
         // view model
         val detailViewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
         detailViewModel.setMangaEndpoint(mangaEndpoint)
 
         detailViewModel.allChapter.observe(this) {
-            adapter.submitList(it)
+            val adapter = AllChapterAdapter(it, this)
+            allContentAct_recyclerView.adapter = adapter
         }
     }
 

@@ -14,7 +14,6 @@ import com.zukron.mangara.model.ChapterMangaResponse
 import com.zukron.mangara.model.DetailMangaResponse
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.network.RestApi
-import com.zukron.mangara.repository.factory.ChapterDataFactory
 import com.zukron.mangara.repository.factory.ChapterImageDataFactory
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -92,13 +91,38 @@ class DetailRepository(context: Context) {
     fun getAllChapter(
         endpoint: String,
         compositeDisposable: CompositeDisposable
-    ): LiveData<PagedList<DetailMangaResponse.Chapter>> {
-        val chapterDataFactory =
-            ChapterDataFactory(endpoint, allContentRepository, compositeDisposable)
+    ): LiveData<List<DetailMangaResponse.Chapter>> {
+        networkState.postValue(NetworkState.LOADED)
 
-        return LivePagedListBuilder(chapterDataFactory, pageListConfig)
-            .setFetchExecutor(executor)
-            .build()
+        return object : LiveData<List<DetailMangaResponse.Chapter>>() {
+            override fun onActive() {
+                super.onActive()
+
+                compositeDisposable.add(
+                    apiService.getDetailManga(endpoint)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .timeout(5, TimeUnit.SECONDS)
+                        .retryWhen {
+                            it.takeWhile { v ->
+                                return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
+                                    networkState.postValue(NetworkState.TIMEOUT)
+                                    true
+                                } else {
+                                    networkState.postValue(NetworkState.ERROR)
+                                    false
+                                }
+                            }
+                        }
+                        .subscribe({
+                            value = it.chapter
+                            networkState.postValue(NetworkState.LOADED)
+                        }, {
+                            networkState.postValue(NetworkState.ERROR)
+                        })
+                )
+            }
+        }
     }
 
     fun getChapterImage(
