@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.zukron.mangara.R
 import com.zukron.mangara.adapter.listener.OnSelectedMangaListener
-import com.zukron.mangara.model.DetailMangaResponse
+import com.zukron.mangara.model.helper.FavoriteMangaHelper
 import com.zukron.mangara.tools.Utilities
 import kotlinx.android.synthetic.main.item_manga.view.*
 
@@ -17,16 +17,16 @@ import kotlinx.android.synthetic.main.item_manga.view.*
  * Created by Zukron Alviandy R on 10/4/2020
  * Contact me if any issues on zukronalviandy@gmail.com
  */
-class FavoriteAdapter(private val favoriteMangaList: List<DetailMangaResponse>) :
-    RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
-
-    private var onSelectedMangaListener: OnSelectedMangaListener? = null
+class FavoriteAdapter(
+    private val favoriteMangaList: List<FavoriteMangaHelper>,
+    private var onSelectedMangaListener: OnSelectedMangaListener
+) : RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val circularProgressDrawable =
             Utilities.circularProgressDrawable(itemView.context)
 
-        fun bindTo(favoriteManga: DetailMangaResponse) {
+        fun bindTo(favoriteManga: FavoriteMangaHelper) {
             itemView.mangaItem_tvTitle.text = favoriteManga.title
             itemView.mangaItem_tvType.text = favoriteManga.type
 
@@ -44,8 +44,8 @@ class FavoriteAdapter(private val favoriteMangaList: List<DetailMangaResponse>) 
                 .placeholder(circularProgressDrawable)
                 .into(itemView.mangaItem_imageView)
 
-            itemView.setOnClickListener { _ ->
-                onSelectedMangaListener?.onSelectedManga(favoriteManga.mangaEndpoint)
+            itemView.setOnClickListener {
+                onSelectedMangaListener.onSelectedManga(favoriteManga.endpoint)
             }
         }
     }
@@ -62,9 +62,5 @@ class FavoriteAdapter(private val favoriteMangaList: List<DetailMangaResponse>) 
 
     override fun getItemCount(): Int {
         return favoriteMangaList.size
-    }
-
-    fun setOnSelectedMangaListener(onSelectedMangaListener: OnSelectedMangaListener) {
-        this.onSelectedMangaListener = onSelectedMangaListener
     }
 }
