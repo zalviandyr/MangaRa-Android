@@ -37,8 +37,7 @@ class FavoriteFragment : Fragment(), OnSelectedMangaListener {
 
         homeViewModel.favoriteManga.observe(requireActivity()) {
             // adapter
-            val adapter = FavoriteAdapter(it)
-            adapter.setOnSelectedMangaListener(this)
+            val adapter = FavoriteAdapter(it, this)
             view.favoriteFrag_recyclerView.adapter = adapter
         }
     }

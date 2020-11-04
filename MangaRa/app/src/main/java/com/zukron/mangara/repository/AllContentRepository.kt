@@ -189,24 +189,4 @@ class AllContentRepository(context: Context) {
                 }
             }
     }
-
-    fun getSearchManga(keyword: String): Flowable<SearchMangaResponse> {
-        networkState.postValue(NetworkState.LOADING)
-
-        return apiService.getSearchManga(keyword)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .timeout(5, TimeUnit.SECONDS)
-            .retryWhen {
-                it.takeWhile { v ->
-                    return@takeWhile if (v is TimeoutException || v is SocketTimeoutException) {
-                        networkState.postValue(NetworkState.TIMEOUT)
-                        true
-                    } else {
-                        networkState.postValue(NetworkState.ERROR)
-                        false
-                    }
-                }
-            }
-    }
 }

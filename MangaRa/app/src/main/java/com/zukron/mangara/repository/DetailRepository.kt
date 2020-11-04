@@ -1,7 +1,6 @@
 package com.zukron.mangara.repository
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseUser
@@ -10,6 +9,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.zukron.mangara.model.ChapterMangaResponse
 import com.zukron.mangara.model.DetailMangaResponse
+import com.zukron.mangara.model.helper.FavoriteMangaHelper
+import com.zukron.mangara.model.helper.HistoryMangaHelper
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.network.RestApi
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -167,13 +168,14 @@ class DetailRepository(context: Context) {
                     // dan yang seharusnya list terurut, contoh 0 1 2 3
                     // user menghapus salah satu favorite dan menjadi 0 1 3
                     // maka program akan tetap menghitung index ke 2 dan akan menyebabkan null
-                    val listItem = currentData.value as List<*>
-                    val listItemNotNull = listItem.filterNotNull()
-                    val lastIndex = listItemNotNull.lastIndex
+                    val genericTypeIndicator =
+                        object : GenericTypeIndicator<List<FavoriteMangaHelper>>() {}
+                    val listItem = currentData.getValue(genericTypeIndicator)!!.filterNotNull()
 
-                    @Suppress("UNCHECKED_CAST")
-                    val map = listItemNotNull[lastIndex] as Map<String, String>
-                    count = (map["indexData"] ?: error("")).toInt() + 1
+                    val lastIndex = listItem.lastIndex
+                    val lastItem = listItem[lastIndex]
+
+                    count = lastItem.indexData.toInt() + 1
                 }
 
                 return Transaction.success(currentData)
@@ -185,12 +187,12 @@ class DetailRepository(context: Context) {
                 currentData: DataSnapshot?
             ) {
                 if (committed) {
+                    val favoriteMangaHelper = FavoriteMangaHelper(
+                        count.toString(), manga.title, manga.thumb, manga.type, manga.mangaEndpoint
+                    )
+
                     val refTemp = ref.child(count.toString())
-                    refTemp.child("indexData").setValue(count.toString())
-                    refTemp.child("thumb").setValue(manga.thumb)
-                    refTemp.child("title").setValue(manga.title)
-                    refTemp.child("endpoint").setValue(manga.mangaEndpoint)
-                    refTemp.child("type").setValue(manga.type)
+                    refTemp.setValue(favoriteMangaHelper)
                 }
             }
         })
@@ -211,13 +213,14 @@ class DetailRepository(context: Context) {
                 query.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.child(firebaseUser.uid).exists()) {
-                            @Suppress("UNCHECKED_CAST")
+                            val genericTypeIndicator =
+                                object : GenericTypeIndicator<List<FavoriteMangaHelper>>() {}
                             val results = snapshot.child(firebaseUser.uid)
-                                .value as List<Map<String, String>>
+                                .getValue(genericTypeIndicator)!!.filterNotNull()
 
-                            for (result in results.filterNotNull()) {
-                                if (result["endpoint"] == manga.mangaEndpoint) {
-                                    value = result["endpoint"] == manga.mangaEndpoint
+                            for (result in results) {
+                                if (result.endpoint == manga.mangaEndpoint) {
+                                    value = result.endpoint == manga.mangaEndpoint
                                     break
                                 }
                             }
@@ -242,15 +245,9 @@ class DetailRepository(context: Context) {
         val query = ref.orderByChild("endpoint").equalTo(manga.mangaEndpoint)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val TAG = "DetailRepository"
-
-                Log.d(TAG, "onDataChange: ${snapshot.children}")
-                Log.d(TAG, "onDataChange: ${snapshot.value}")
-
                 for (itemSnapshot in snapshot.children) {
                     itemSnapshot.ref.removeValue()
                 }
-
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -272,12 +269,14 @@ class DetailRepository(context: Context) {
 
             override fun doTransaction(currentData: MutableData): Transaction.Result {
                 if (currentData.value != null) {
-                    val listItem = currentData.value as List<*>
-                    val lastIndex = listItem.lastIndex
+                    val genericTypeIndicator =
+                        object : GenericTypeIndicator<List<HistoryMangaHelper>>() {}
+                    val listItem = currentData.getValue(genericTypeIndicator)!!
 
-                    @Suppress("UNCHECKED_CAST")
-                    val map = listItem[lastIndex] as Map<String, String>
-                    count = (map["indexData"] ?: error("")).toInt() + 1
+                    val lastIndex = listItem.lastIndex
+                    val lastItem = listItem[lastIndex]
+
+                    count = lastItem.indexData.toInt() + 1
                 }
 
                 return Transaction.success(currentData)
@@ -290,26 +289,30 @@ class DetailRepository(context: Context) {
             ) {
                 // menghindari data dengan endpoint chapter yang duplikat
                 if (committed) {
-                    @Suppress("UNCHECKED_CAST")
-                    val dataList = currentData?.value as List<Map<String, String>>
+                    val genericTypeIndicator =
+                        object : GenericTypeIndicator<List<HistoryMangaHelper>>() {}
 
-                    val isExist = dataList.find {
-                        it["mangaEndpoint"] == manga.mangaEndpoint
+                    val dataList = currentData?.getValue(genericTypeIndicator)
+
+                    val isExist = dataList?.find {
+                        it.mangaEndpoint == manga.mangaEndpoint
                     }
-                    val count = if (isExist != null) {
-                        isExist["indexData"]?.toInt()
-                    } else {
-                        count
-                    }
+
+                    // set count menjadi index data yang duplikat
+                    val count = isExist?.indexData?.toInt() ?: count
+
+                    val historyMangaHelper = HistoryMangaHelper(
+                        count.toString(),
+                        manga.title,
+                        manga.thumb,
+                        manga.type,
+                        chapter.chapterTitle,
+                        chapter.chapterEndpoint,
+                        manga.mangaEndpoint
+                    )
 
                     val refTemp = ref.child(count.toString())
-                    refTemp.child("indexData").setValue(count.toString())
-                    refTemp.child("title").setValue(manga.title)
-                    refTemp.child("thumb").setValue(manga.thumb)
-                    refTemp.child("type").setValue(manga.type)
-                    refTemp.child("mangaEndpoint").setValue(manga.mangaEndpoint)
-                    refTemp.child("chapter").setValue(chapter.chapterTitle)
-                    refTemp.child("lastChapter").setValue(chapter.chapterEndpoint)
+                    refTemp.setValue(historyMangaHelper)
                 }
             }
         })
@@ -318,8 +321,8 @@ class DetailRepository(context: Context) {
     fun getHistoryByMangaEndpoint(
         firebaseUser: FirebaseUser,
         manga: DetailMangaResponse
-    ): LiveData<Map<String, String>?> {
-        return object : LiveData<Map<String, String>?>() {
+    ): LiveData<HistoryMangaHelper> {
+        return object : LiveData<HistoryMangaHelper>() {
             override fun onActive() {
                 super.onActive()
 
@@ -329,12 +332,13 @@ class DetailRepository(context: Context) {
                 val query = ref.orderByKey().equalTo(firebaseUser.uid)
                 query.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        @Suppress("UNCHECKED_CAST")
+                        val genericTypeIndicator =
+                            object : GenericTypeIndicator<List<HistoryMangaHelper>>() {}
                         val results = snapshot.child(firebaseUser.uid)
-                            .value as List<Map<String, String>>
+                            .getValue(genericTypeIndicator)
 
-                        val result = results.find {
-                            it["mangaEndpoint"] == manga.mangaEndpoint
+                        val result = results?.find {
+                            it.mangaEndpoint == manga.mangaEndpoint
                         }
                         value = result
                     }

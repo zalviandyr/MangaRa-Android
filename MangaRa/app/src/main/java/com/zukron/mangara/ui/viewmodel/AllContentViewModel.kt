@@ -18,7 +18,6 @@ class AllContentViewModel(application: Application) : AndroidViewModel(applicati
     private val compositeDisposable = CompositeDisposable()
     private val type: MutableLiveData<String> = MutableLiveData()
     private val genreEndpoint: MutableLiveData<String> = MutableLiveData()
-    private val searchKeyword: MutableLiveData<String> = MutableLiveData()
 
     val networkState = pagedRepository.networkState
 
@@ -37,11 +36,6 @@ class AllContentViewModel(application: Application) : AndroidViewModel(applicati
     val genreManga = Transformations
         .switchMap(genreEndpoint) {
             pagedRepository.allGenreManga(it, compositeDisposable)
-        }
-
-    val searchManga = Transformations
-        .switchMap(searchKeyword) {
-            pagedRepository.searchManga(it, compositeDisposable)
         }
 
     fun isListEmpty(): Boolean {
@@ -66,13 +60,6 @@ class AllContentViewModel(application: Application) : AndroidViewModel(applicati
             return
         }
         genreEndpoint.value = value
-    }
-
-    fun setSearchKeyword(value: String) {
-        if (searchKeyword.value == value) {
-            return
-        }
-        searchKeyword.value = value
     }
 
     override fun onCleared() {

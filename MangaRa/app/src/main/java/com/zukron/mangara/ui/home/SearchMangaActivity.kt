@@ -8,18 +8,16 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.ViewModelProvider
 import com.zukron.mangara.R
-import com.zukron.mangara.adapter.AllContentPagedListAdapter
+import com.zukron.mangara.adapter.SearchMangaAdapter
 import com.zukron.mangara.adapter.listener.OnSelectedMangaListener
-import com.zukron.mangara.model.SearchMangaResponse
 import com.zukron.mangara.network.NetworkState
 import com.zukron.mangara.ui.detail.DetailMangaActivity
-import com.zukron.mangara.ui.viewmodel.AllContentViewModel
+import com.zukron.mangara.ui.viewmodel.HomeViewModel
 import kotlinx.android.synthetic.main.activity_search_manga.*
 
 class SearchMangaActivity
     : AppCompatActivity(), OnSelectedMangaListener {
 
-    private lateinit var allContentViewModel: AllContentViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_manga)
@@ -34,15 +32,13 @@ class SearchMangaActivity
             finish()
         }
 
-        // adapter
-        val adapter =
-            AllContentPagedListAdapter<SearchMangaResponse.SearchMangaResponseItem>(this)
-        searchMangaAct_recyclerView.adapter = adapter
+        // view model
+        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         // search
         searchMangaAct_inputSearch.editText?.setOnEditorActionListener { textView, i, keyEvent ->
             if (i == EditorInfo.IME_ACTION_SEARCH || keyEvent.action == KeyEvent.KEYCODE_ENTER) {
-                allContentViewModel.setSearchKeyword(textView.text.toString())
+                homeViewModel.setSearchMangaKeyword(textView.text.toString())
                 searchMangaAct_progressBar.visibility = View.VISIBLE
                 true
             } else {
@@ -50,14 +46,13 @@ class SearchMangaActivity
             }
         }
 
-        // view model
-        allContentViewModel = ViewModelProvider(this).get(AllContentViewModel::class.java)
-
-        allContentViewModel.searchManga.observe(this) {
-            adapter.submitList(it)
+        homeViewModel.searchManga.observe(this) {
+            // adapter
+            val adapter = SearchMangaAdapter(it, this)
+            searchMangaAct_recyclerView.adapter = adapter
         }
 
-        allContentViewModel.networkState.observe(this) {
+        homeViewModel.networkState.observe(this) {
             if (it == NetworkState.LOADED) {
                 searchMangaAct_progressBar.visibility = View.GONE
             }

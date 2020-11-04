@@ -92,11 +92,12 @@ class DetailMangaActivity : AppCompatActivity(), OnSelectedChapterListener {
 
         detailViewModel.historyMangaByEndpoint.observe(this) {
             chapterHistory = if (it != null) {
-                val historyTitle = it["chapter"]
-                val historyEndpoint = it["lastChapter"]
+                val historyTitle = it.chapter
+                val historyEndpoint = it.lastChapter
 
-                DetailMangaResponse.Chapter(historyEndpoint!!, historyTitle!!)
+                DetailMangaResponse.Chapter(historyEndpoint, historyTitle)
             } else {
+                // jika tidak ada maka akan membaca chapter yng paling awal
                 detailViewModel.detailManga.value!!.chapter.lastOrNull()!!
             }
         }

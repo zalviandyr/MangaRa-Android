@@ -1,9 +1,12 @@
 package com.zukron.mangara
 
 import android.util.Log
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.zukron.mangara.network.RestApi
+import com.zukron.mangara.repository.HomeRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Test

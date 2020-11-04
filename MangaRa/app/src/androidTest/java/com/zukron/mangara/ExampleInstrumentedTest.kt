@@ -4,11 +4,12 @@ import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.zukron.mangara.model.PopularMangaResponse
 import com.zukron.mangara.network.ApiService
 import com.zukron.mangara.network.RestApi
+import com.zukron.mangara.repository.HomeRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -18,10 +19,6 @@ import org.junit.runner.RunWith
 import org.junit.Before
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -105,5 +102,21 @@ class ExampleInstrumentedTest {
         Log.d(TAG, "buildGreeting: $evening2")
 
         Log.d(TAG, "buildGreetingSAEKADAL: ${localTime in (evening1 + 1) until evening2}")
+    }
+
+    @Test
+    fun testFavoriteMangaHelper() {
+        // login
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val app = FirebaseApp.initializeApp(appContext)
+        val auth = FirebaseAuth.getInstance(app!!)
+        auth.signInWithEmailAndPassword("reitaray5@gmail.com", "Mean1234")
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d(TAG, "testFavoriteMangaHelper: Masuk")
+                    val homeRepository = HomeRepository.getInstance(appContext)
+                    homeRepository.getFavoriteManga(auth.currentUser!!)
+                }
+            }
     }
 }

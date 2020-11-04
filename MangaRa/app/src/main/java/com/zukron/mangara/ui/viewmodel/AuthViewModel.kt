@@ -7,6 +7,8 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.zukron.mangara.model.helper.FavoriteMangaHelper
+import com.zukron.mangara.model.helper.HistoryMangaHelper
 
 /**
  * Project name is Manga Ra
@@ -45,11 +47,13 @@ class AuthViewModel : ViewModel() {
                     // maka firebase mendeteksi itu menjadi HashMap
                     val refFavorite = firebaseDataBase.getReference("favorite")
                         .child(firebaseAuth.currentUser?.uid!!)
-                    refFavorite.child("0").child("indexData").setValue("0")
+                    val favoriteMangaHelper = FavoriteMangaHelper(indexData = "0")
+                    refFavorite.child("0").setValue(favoriteMangaHelper)
 
                     val refHistory = firebaseDataBase.getReference("history")
                         .child(firebaseAuth.currentUser?.uid!!)
-                    refHistory.child("0").child("indexData").setValue("0")
+                    val historyMangaHelper = HistoryMangaHelper(indexData = "0")
+                    refHistory.child("0").setValue(historyMangaHelper)
 
                     _isActionSuccess.value = Action(Status.SUCCESS, "Account created")
                 } else {

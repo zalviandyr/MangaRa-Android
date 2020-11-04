@@ -5,47 +5,43 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.zukron.mangara.R
 import com.zukron.mangara.adapter.listener.OnSelectedMangaListener
-import com.zukron.mangara.model.helper.FavoriteMangaHelper
+import com.zukron.mangara.model.SearchMangaResponse
 import com.zukron.mangara.tools.Utilities
 import kotlinx.android.synthetic.main.item_manga.view.*
 
 /**
  * Project name is Manga Ra
- * Created by Zukron Alviandy R on 10/4/2020
+ * Created by Zukron Alviandy R on 10/18/2020
  * Contact me if any issues on zukronalviandy@gmail.com
  */
-class FavoriteAdapter(
-    private val favoriteMangaList: List<FavoriteMangaHelper>,
-    private var onSelectedMangaListener: OnSelectedMangaListener
-) : RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
+class SearchMangaAdapter(
+    private val mangaList: List<SearchMangaResponse.SearchMangaResponseItem>,
+    private val onSelectedMangaListener: OnSelectedMangaListener
+): RecyclerView.Adapter<SearchMangaAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val circularProgressDrawable =
             Utilities.circularProgressDrawable(itemView.context)
 
-        fun bindTo(favoriteManga: FavoriteMangaHelper) {
-            itemView.mangaItem_tvTitle.text = favoriteManga.title
-            itemView.mangaItem_tvType.text = favoriteManga.type
+        fun bindTo(searchMangaResponseItem: SearchMangaResponse.SearchMangaResponseItem) {
+            itemView.mangaItem_tvTitle.text = searchMangaResponseItem.title
+            itemView.mangaItem_tvType.text = searchMangaResponseItem.type
+            itemView.mangaItem_tvUpdateOn.text = searchMangaResponseItem.updatedOn
 
             // background type
             itemView.mangaItem_tvType.background =
-                Utilities.backgroundType(favoriteManga.type, itemView.context)
-
-            // set image view height
-            val layoutParams = itemView.mangaItem_imageView.layoutParams
-            layoutParams.width = itemView.context.resources.getDimension(R.dimen.thumbnail_fav_history_width).toInt()
+                Utilities.backgroundType(searchMangaResponseItem.type, itemView.context)
 
             Glide.with(itemView.context)
-                .load(favoriteManga.thumb)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .load(searchMangaResponseItem.thumb)
                 .placeholder(circularProgressDrawable)
                 .into(itemView.mangaItem_imageView)
 
+            // listener
             itemView.setOnClickListener {
-                onSelectedMangaListener.onSelectedManga(favoriteManga.endpoint)
+                onSelectedMangaListener.onSelectedManga(searchMangaResponseItem.endpoint)
             }
         }
     }
@@ -57,10 +53,10 @@ class FavoriteAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindTo(favoriteMangaList.get(position))
+        holder.bindTo(mangaList[position])
     }
 
     override fun getItemCount(): Int {
-        return favoriteMangaList.size
+        return mangaList.size
     }
 }
