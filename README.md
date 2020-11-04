@@ -3,5 +3,8 @@
 **Name :** Manga Ra
 
 **API Server**
-<br>
-http://mangamint.glitch.me/api
+
+-   http://mangamint.glitch.me/api
+
+**Screenshot**
+![screenshot](https://raw.githubusercontent.com/zalviandyr/MangaRa-Android/master/Screenshot/Manga%20Ra%20-%20Android.jpg)
