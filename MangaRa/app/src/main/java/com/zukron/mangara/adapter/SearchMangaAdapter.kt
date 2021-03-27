@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.item_manga.view.*
  * Contact me if any issues on zukronalviandy@gmail.com
  */
 class SearchMangaAdapter(
-    private val mangaList: List<SearchMangaResponse.SearchMangaResponseItem>,
+    private val mangaList: List<SearchMangaResponse.Manga>,
     private val onSelectedMangaListener: OnSelectedMangaListener
 ): RecyclerView.Adapter<SearchMangaAdapter.ViewHolder>() {
 
@@ -25,7 +25,7 @@ class SearchMangaAdapter(
         private val circularProgressDrawable =
             Utilities.circularProgressDrawable(itemView.context)
 
-        fun bindTo(searchMangaResponseItem: SearchMangaResponse.SearchMangaResponseItem) {
+        fun bindTo(searchMangaResponseItem: SearchMangaResponse.Manga) {
             itemView.mangaItem_tvTitle.text = searchMangaResponseItem.title
             itemView.mangaItem_tvType.text = searchMangaResponseItem.type
             itemView.mangaItem_tvUpdateOn.text = searchMangaResponseItem.updatedOn

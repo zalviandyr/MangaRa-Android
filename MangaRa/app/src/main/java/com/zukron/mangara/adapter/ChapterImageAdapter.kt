@@ -1,11 +1,17 @@
 package com.zukron.mangara.adapter
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.zukron.mangara.R
 import com.zukron.mangara.model.ChapterMangaResponse
 import com.zukron.mangara.tools.Utilities
@@ -24,13 +30,33 @@ class ChapterImageAdapter(private val chapterImageList: List<ChapterMangaRespons
             Utilities.circularProgressDrawable(itemView.context)
 
         fun bindTo(chapterImage: ChapterMangaResponse.ChapterImage) {
+//            itemView.chapterMangaItem_imageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
             Glide.with(itemView.context)
+                .asBitmap()
                 .load(chapterImage.chapterImageLink)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(circularProgressDrawable)
                 .error(R.drawable.failed_load_image)
-                .override(1600)
+                .override(Target.SIZE_ORIGINAL)
                 .into(itemView.chapterMangaItem_imageView)
+//                .into(object : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+//                    override fun onResourceReady(
+//                        resource: Bitmap,
+//                        transition: Transition<in Bitmap>?
+//                    ) {
+////                        itemView.chapterMangaItem_imageView.post {
+////                            itemView.chapterMangaItem_imageView.setImageBitmap(
+////                                resource
+////                            )
+////                        }
+//                        itemView.chapterMangaItem_imageView.setImageBitmap(resource)
+//                    }
+//
+//                    override fun onLoadCleared(placeholder: Drawable?) {
+//                        // who care
+//                    }
+//                })
         }
     }
 

@@ -131,8 +131,8 @@ class HomeRepository(context: Context) {
     fun getSearchManga(
         keyword: String,
         compositeDisposable: CompositeDisposable
-    ): LiveData<List<SearchMangaResponse.SearchMangaResponseItem>> {
-        return object : LiveData<List<SearchMangaResponse.SearchMangaResponseItem>>() {
+    ): LiveData<List<SearchMangaResponse.Manga>> {
+        return object : LiveData<List<SearchMangaResponse.Manga>>() {
             override fun onActive() {
                 super.onActive()
 
@@ -153,7 +153,7 @@ class HomeRepository(context: Context) {
                             }
                         }
                         .subscribe({
-                            value = it
+                            value = it.data
                             networkState.postValue(NetworkState.LOADED)
                         }, {
                             networkState.postValue(NetworkState.ERROR)

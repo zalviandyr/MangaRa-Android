@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
  * Contact me if any issues on zukronalviandy@gmail.com
  */
 object RestApi {
-    private const val BASE_URL = "https://mangamint.glitch.me/api/"
+    private const val BASE_URL = "https://mangamint.kaedenoki.net/api/"
     private const val cacheSize = (10 * 1024 * 1024).toLong() // 10 mb
     private var okHttpClient: OkHttpClient? = null
 
@@ -34,7 +34,7 @@ object RestApi {
             .cache(cache)
             .connectTimeout(10, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
-//            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
             .addInterceptor(object : OfflineInterceptor() {
                 override fun isInternetAvailable(): Int {
                     return Utilities.getConnectionType(context)

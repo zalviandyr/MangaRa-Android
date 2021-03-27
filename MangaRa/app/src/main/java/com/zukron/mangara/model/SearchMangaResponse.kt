@@ -3,8 +3,11 @@ package com.zukron.mangara.model
 
 import com.google.gson.annotations.SerializedName
 
-class SearchMangaResponse : ArrayList<SearchMangaResponse.SearchMangaResponseItem>() {
-    data class SearchMangaResponseItem(
+data class SearchMangaResponse(
+    @SerializedName("manga_list")
+    val data: List<Manga>,
+) {
+    data class Manga(
         @SerializedName("endpoint")
         val endpoint: String,
         @SerializedName("thumb")

@@ -9,7 +9,7 @@ data class GenreResponse(
     data class Genre(
         @SerializedName("endpoint")
         val endpoint: String,
-        @SerializedName("title")
+        @SerializedName("genre_name")
         val title: String
     )
 }

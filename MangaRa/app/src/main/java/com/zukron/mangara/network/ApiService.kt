@@ -40,7 +40,7 @@ interface ApiService {
         @Path("page") page: Int
     ): Flowable<GenreMangaResponse>
 
-    @GET("cari/{keyword}")
+    @GET("search/{keyword}")
     fun getSearchManga(
         @Path("keyword") keyword: String
     ): Flowable<SearchMangaResponse>
